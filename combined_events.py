@@ -57,7 +57,7 @@ scen = 'historical'
 heatwave_thres = 'per95' # threshold for defining heatwaves
 temp_var = 'td' #dry or wet bulb heatwaves
 
-save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/%s/combined_events/%s/%s/' % (loc, temp_var, heatwave_thres)  
+save_path = '/nfs/a321/earsch/floods_heatwaves/processed/combined_events/%s/%s/%s/' % (loc, temp_var, heatwave_thres)  
 
 
 ##flood events
@@ -153,8 +153,9 @@ def metrics(events, nt):
         
         #assign 1s to start and end dates of combined events
         start_event_array[start_event[i]] = 1
-        end_event_array[end_event[i]] = 1 # last day of combined event 
-                                                        # is an event day day
+        if end_event[i] < nt: # otherwise outside array, a dn event ends outsied time frame
+            end_event_array[end_event[i]] = 1 # last day of combined event 
+                                                            # is an event day day
                      
 
     return [count_event_days, count_events, event_duration, start_event_array, end_event_array]
@@ -378,9 +379,9 @@ fafter = output[4]
 
 for n in np.arange(len(ndays)):
     
-    save_name = save_path +  'fbefore_' + str(ndays[n]) + '_combinevents_' + mod + '_' + scen + '.nc'
+    save_name = save_path +  'fbefore_' + str(ndays[n]) + '_combinedevents_' + mod + '_' + scen + '.nc'
     iris.save(fbefore[n], save_name)
-    save_name = save_path +  'fafter_' + str(ndays[n]) + '_combinevents_' + mod + '_' + scen + '.nc'
+    save_name = save_path +  'fafter_' + str(ndays[n]) + '_combinedevents_' + mod + '_' + scen + '.nc'
     iris.save(fafter[n], save_name)
 
 #save before/after mets
@@ -389,7 +390,7 @@ fafter_mets = output[5]
 for n in np.arange(len(ndays)):
     
     for i in np.arange(len(fbefore_mets[n])):
-        save_name = save_path +  'fbefore_' + str(ndays[n]) + var_names[i] + '_' + mod + '_' + scen + '.nc'
+        save_name = save_path +  'fbefore_' + str(ndays[n]) + '_' + var_names[i] + '_' + mod + '_' + scen + '.nc'
         iris.save(fbefore_mets[n][i], save_name)
-        save_name = save_path +  'fafter_' + str(ndays[n]) + var_names[i] + '_' + mod + '_' + scen + '.nc'
+        save_name = save_path +  'fafter_' + str(ndays[n]) + '_' + var_names[i] + '_' + mod + '_' + scen + '.nc'
         iris.save(fafter_mets[n][i], save_name)
