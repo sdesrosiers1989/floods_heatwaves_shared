@@ -114,6 +114,12 @@ temp = temp.extract(cons)
 
 ls_regrid = ls_regrid.extract(cons)
 
+#%% drop first half of 1997 and second hafl of 2006
+# 1st June 1997 = 150
+# 1st June 2006 = 3390
+
+#will give 9 years exactly, starting 1st juen 1997, ending 1st june (exclusive)
+temp = temp[150:3390,:,:]
 
 #%% calc threshold
 
@@ -279,8 +285,8 @@ iris.save(mag, save_name)
 per_cube = per_95
 per_name = 'per95/'
 
-per_cube = per_975
-per_name = 'per975/'
+#per_cube = per_975
+#per_name = 'per975/'
 
 output = get_heatwave(temp, per_cube, 3.0, mag, ls_regrid)
 
