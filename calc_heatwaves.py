@@ -73,6 +73,10 @@ temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25
 #temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_historical_p25grid.nc')
 #temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_rcp85_p25grid.nc')
 
+#add aux coords
+temp.add_aux_coord(iris.coords.AuxCoord(mod, long_name = 'model'))
+temp.add_aux_coord(iris.coords.AuxCoord(scen, long_name = 'sim'))
+
 #convert Temp to celsius
 temp.convert_units('celsius')
 
@@ -275,8 +279,8 @@ iris.save(mag, save_name)
 per_cube = per_95
 per_name = 'per95/'
 
-#p#er_cube = per_975
-#p#er_name = 'per975/'
+per_cube = per_975
+per_name = 'per975/'
 
 output = get_heatwave(temp, per_cube, 3.0, mag, ls_regrid)
 
