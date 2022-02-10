@@ -32,8 +32,8 @@ Process
 	Inputs:
 	Td or Twb
 
-	Scripts:
-	...
+	Scripts (heatwaves repo):
+	calc_heatwaves.py
 
 
 4. 	Calculate WAP
