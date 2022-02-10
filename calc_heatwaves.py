@@ -62,16 +62,16 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 # set up save details based on laoded data
 save_path = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/pan_africa/td/attributes/'  
 save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/pan_africa/td/thres/'  
-mod = 'p25'
-scen = 'historical'
+mod = 'cp4'
+scen = 'rcp85'
 
 #P25 
-temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_historical.nc')
+#temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_historical.nc')
 #temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_rcp85.nc')
 
 #CP4
 #temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_historical_p25grid.nc')
-#temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_rcp85_p25grid.nc')
+temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_rcp85_p25grid.nc')
 
 #add aux coords
 temp.add_aux_coord(iris.coords.AuxCoord(mod, long_name = 'model'))
@@ -87,8 +87,11 @@ ls = iris.load_cube('/nfs/a277/IMPALA/data/4km/ANCILS/landseamask_ancil_4km_regr
 ls.coord('longitude').points = ls.coord('longitude').points - 360
 ls.coord('longitude').guess_bounds()
 ls.coord('latitude').guess_bounds()
-temp.coord('longitude').guess_bounds()
-temp.coord('latitude').guess_bounds()
+try:
+    temp.coord('longitude').guess_bounds()
+    temp.coord('latitude').guess_bounds()
+except:
+    print('has bounds')
 ls.coord(axis='x').coord_system = cs
 ls.coord(axis='y').coord_system = cs
 ls_regrid = ls.regrid(temp, iris.analysis.AreaWeighted())
