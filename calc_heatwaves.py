@@ -159,7 +159,8 @@ def magnitude(temp):
 
 
 def get_heatwave(cube, hw_thres, nconsecutive_days, mag, ls):
-    ''' Calculate duration, number of heatwave days, locations of heatwave
+    ''' Calculate duration, number of heatwave days, locations of heatwave,
+        start and and day of heatwaves, and 
          and magnitude of heatwaves.
          Calcualted only for land points
     
@@ -188,8 +189,13 @@ def get_heatwave(cube, hw_thres, nconsecutive_days, mag, ls):
     heatwave_duration.data = np.zeros((nt,nlat,nlon))
     heatwaves = copy.deepcopy(cube)
     heatwaves.data = np.zeros((nt,nlat,nlon))
+    start_heatwave = copy.deepcopy(cube)
+    start_heatwave.data = np.zeros((nt,nlat,nlon))
+    end_heatwave = copy.deepcopy(cube)
+    end_heatwave.data = np.zeros((nt,nlat,nlon))
     heatwave_mag = copy.deepcopy(cube)
     heatwave_mag.data = np.zeros((nt,nlat,nlon))
+    
     
     for y in range(nlat):
         for x in range(nlon):
@@ -211,8 +217,7 @@ def get_heatwave(cube, hw_thres, nconsecutive_days, mag, ls):
                 #nend=len(end_hot)
                 len_heat=end_hot-start_hot
                 
-                
-                
+               
                 #get total num heatwave days
                 n_heatwave_days = np.sum(len_heat[len_heat >= nconsecutive_days])
                 count_heatwave_days.data[y,x] = n_heatwave_days
@@ -230,11 +235,17 @@ def get_heatwave(cube, hw_thres, nconsecutive_days, mag, ls):
                         heatwave_duration.data[start_hot[i], y,x]=len_heat[i]
                         
                         #heatwave days - get indices assocaited with heatwave
+                        #last day of heatwave_days is a heatwave
                         heatwave_days = np.arange(start_hot[i], end_hot[i])
                         
                         #heatwave magnitude
                         mag_sum = mag.data[heatwave_days, y, x].sum()
-                        heatwave_mag.data[start_hot, y, x] = mag_sum
+                        heatwave_mag.data[start_hot[i], y, x] = mag_sum
+                        
+                        #assign 1s to start and end dates of heatwaves
+                        start_heatwave.data[start_hot[i], y,x] = 1
+                        end_heatwave.data[end_hot[i] - 1, y,x] = 1 # last day of heatwave, 
+                                                                   # is a heatwave day
                         
                         #assign 1 to each day in heatwave (all others 0)
                         for index in heatwave_days:
@@ -243,7 +254,7 @@ def get_heatwave(cube, hw_thres, nconsecutive_days, mag, ls):
                         
                         
 
-    return [heatwaves, heatwave_duration, count_heatwave_days, heatwave_mag]
+    return [heatwaves, heatwave_duration, count_heatwave_days, heatwave_mag, start_heatwave, end_heatwave]
 
 
 
@@ -264,13 +275,13 @@ iris.save(mag, save_name)
 per_cube = per_95
 per_name = 'per95/'
 
-p#er_cube = per_975
-p#er_name = 'per975/'
+#p#er_cube = per_975
+#p#er_name = 'per975/'
 
 output = get_heatwave(temp, per_cube, 3.0, mag, ls_regrid)
 
 #save data
-var_names = ['heatwaves', 'duration', 'ndays', 'heatwavemagnitude']
+var_names = ['heatwaves', 'duration', 'ndays', 'heatwavemagnitude', 'startheatwave', 'endheatwave']
 
 
 for i in np.arange(len(output)):
