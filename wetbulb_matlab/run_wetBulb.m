@@ -1,8 +1,47 @@
-%% Import data
+%% Calculate WetBulb temperature
+% Apply WetBulb.m function to input model data (temp, pressure, specific
+% humidity) and save output as a netcdf file
 
+%% Set up functions
 %change to folder where WetBulb.m is (function to calculate wetbulb
 %temperature)
-cd /nfs/see-fs-02_users/earsch/Documents/Leeds/Repos/floods_heatwaves/wetbulb_matlab
+cd /nfs/see-fs-02_users/earsch/Documents/Leeds/Repos/floods_heatwaves/wetbulb_matlab;
+
+%% Set up input data
+% set model and scen, and then input file names
+
+%model
+model = 'p25';
+%model = 'cp4';
+
+%set year (note matlab starts at 1, indexing is inclusive)
+time_name = 'part1';
+timestart = 1;
+timeend = 1000;
+
+%scenarios
+scen = 'histo';
+t_scen = 'historical';
+% scen = 'rcp85';
+% t_scen = 'rcp85';
+
+%grid
+if strcmp(model,'cp4') == true
+    grid = '_p25grid';
+else
+    grid = '';
+end
+
+%files
+temp_file = strcat('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_', model, '_', t_scen, grid, '.nc');
+pa_file = strcat('/nfs/a321/earsch/floods_heatwaves/input_data/pressure/pa_', model, grid, '_daily_', scen, '.nc');
+hus_file = strcat('/nfs/a321/earsch/floods_heatwaves/input_data/humidity/spechumid_', model, grid, '_daily_', scen, '.nc');
+
+% save info
+save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wetbulb_temp/wb_';
+file_name = strcat(save_path, model, '_', scen, '_', time_name, '.nc');
+
+
 
 %% extract data to west africa
 
@@ -12,12 +51,10 @@ min_lon = -20.0;
 max_lon = 16.0;
 
 
-lons = ncread('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_historical.nc', 'longitude');
-lats = ncread('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_historical.nc', 'latitude');
-time = ncread('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_historical.nc', 'time');
+lons = ncread(temp_file, 'longitude');
+lats = ncread(temp_file, 'latitude');
+time = ncread(temp_file, 'time');
 
-timestart = 1;
-timeend = 360;
 
 latstart = find(lats > min_lat, 1, 'first');
 latend = find(lats < max_lat, 1, 'last');
@@ -31,11 +68,11 @@ end_loc = [(lonend-lonstart)+1 (latend-latstart)+1 timeend];
 len_time = size(time);
 len_time = len_time(1);
 
-%% Data in order lons, lats, time
+%% Import data, extracting to west africa
 
-temp = ncread('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_historical.nc', 'd03236', start_loc, end_loc);
-pa = ncread('/nfs/a321/earsch/floods_heatwaves/input_data/pressure/pa_p25_daily_histo.nc', 'c00409', start_loc, end_loc);
-hus = ncread('/nfs/a321/earsch/floods_heatwaves/input_data/humidity/spechumid_p25_daily_histo.nc', 'c03237', start_loc, end_loc);
+temp = ncread(temp_file, 'd03236', start_loc, end_loc);
+pa = ncread(pa_file, 'c00409', start_loc, end_loc);
+hus = ncread(hus_file, 'c03237', start_loc, end_loc);
 
 
 %% Get into correct units for wetbulb func
@@ -49,14 +86,24 @@ temp = temp - 273.15;
 
 disp('Computing wb')
 
-[wb,Teq,epott] = WetBulb(temp, pa, hus,0, 1);
+%for y = 1:103
+%    for z = 1:70
+%        disp_var = [y z];
+%        disp(disp_var)
+%        t = temp(y, z, 1);
+%        p = pa(y, z, 1);
+%        h = hus(y, z, 1);
+%        [wb, Teq, epott] = WetBulb(t, p, h, 0, 1);
+%    end
+%end
+
+[wb,Teq,epott] = WetBulb(temp, pa, hus, 0, 1);
 
 %% create dimensions for new netcdf file
 
 disp('Creating file')
 
-file_name = '/nfs/a321/earsch/floods_heatwaves/processed/wetbulb_temp/wb_p25_historical_year1.nc';
-cmode = 'NETCDF4';
+cmode = bitor('NETCDF4', 'CLOBBER'); %will overwrite existing files, create netcdf4 file
 
 new_nc = netcdf.create(file_name, cmode);
 
