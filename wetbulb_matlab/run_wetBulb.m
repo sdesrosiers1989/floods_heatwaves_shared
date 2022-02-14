@@ -15,9 +15,12 @@ model = 'p25';
 %model = 'cp4';
 
 %set year (note matlab starts at 1, indexing is inclusive)
-time_name = 'part1';
-timestart = 1;
-timeend = 1000;
+%note that temp goes up to 3660 (feb 2007) while pa and RHs only go up to
+%3600 (end up 2006) -> doesn't matter as drop last half of 2006 anyway, but
+%be aware that time length is different
+time_name = 'part3';
+timestart = 3001;
+timeend = 3600;
 
 %scenarios
 scen = 'histo';
@@ -63,7 +66,7 @@ lonstart = find(lons > min_lon, 1, 'first');
 lonend = find(lons < max_lon, 1, 'last');
 
 start_loc = [lonstart latstart timestart];
-end_loc = [(lonend-lonstart)+1 (latend-latstart)+1 timeend];
+end_loc = [(lonend-lonstart)+1 (latend-latstart)+1 (timeend - timestart)+1];
 
 len_time = size(time);
 len_time = len_time(1);
@@ -103,14 +106,14 @@ disp('Computing wb')
 
 disp('Creating file')
 
-cmode = bitor('NETCDF4', 'CLOBBER'); %will overwrite existing files, create netcdf4 file
+cmode = 'NETCDF4'; %will overwrite existing files, create netcdf4 file
 
 new_nc = netcdf.create(file_name, cmode);
 
 %create dimensions
 londim = netcdf.defDim(new_nc, 'longitude', end_loc(1));
 latdim = netcdf.defDim(new_nc, 'latitude', end_loc(2));
-timedim = netcdf.defDim(new_nc, 'time', timeend);
+timedim = netcdf.defDim(new_nc, 'time', end_loc(3));
 
 %create wb variable
 wb_var = netcdf.defVar(new_nc, 'wb', 'NC_FLOAT', [londim, latdim, timedim]);
