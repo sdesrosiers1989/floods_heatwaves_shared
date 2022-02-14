@@ -57,21 +57,31 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 
 
 
-#%% Load data
+#%% User inputs - model, temp_type and scenario
 
 # set up save details based on laoded data
-save_path = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/pan_africa/td/attributes/'  
-save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/pan_africa/td/thres/'  
-mod = 'cp4'
-scen = 'rcp85'
+#temp_type = 'td'
+temp_type = 'tw' # currently only ahve fro West Africa
+mod = 'p25'
+scen = 'historical'
 
+#%% Load data basedon user inputs
+
+save_path = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/pan_africa/' + temp_type + '/attributes/'  
+save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/pan_africa/' + temp_type + '/thres/'  
+
+## td temps
 #P25 
-#temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_historical.nc')
-#temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_rcp85.nc')
+if temp_type == 'td':
+    if mod == 'p25':
+        fname = '/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_' + scen + '.nc'
+    elif mod == 'cp4':
+        fname = '/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_' + scen + '_p25grid.nc'
+elif temp_type == 'tw':
+    fname = '/nfs/a321/earsch/floods_heatwaves/processed/wetbulb_temp/wb_' + mod + '_daily_'  + scen + '_wa.nc'
+       
+temp = iris.load_cube(fname)
 
-#CP4
-#temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_historical_p25grid.nc')
-temp = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_rcp85_p25grid.nc')
 
 #add aux coords
 temp.add_aux_coord(iris.coords.AuxCoord(mod, long_name = 'model'))
@@ -101,8 +111,8 @@ ls_regrid =ls_regrid[0,0]
 #%% Extract area
 # change save path if run
 
-save_path = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/west_africa/td/attributes/'  
-save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/west_africa/td/thres/'
+save_path = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/west_africa/' + temp_type + '/attributes/'  
+save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/west_africa/' + temp_type + '/thres/'  
 
 min_lat = 3.5
 max_lat = 20.0
@@ -122,7 +132,9 @@ ls_regrid = ls_regrid.extract(cons)
 # 1st June 2006 = 3390
 
 #will give 9 years exactly, starting 1st juen 1997, ending 1st june (exclusive)
+#this works for td and Tw - though tw only goes up to 3600 rather than 3660
 temp = temp[150:3390,:,:]
+
 
 #%% calc threshold
 
