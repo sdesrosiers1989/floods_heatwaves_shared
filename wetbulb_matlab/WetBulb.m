@@ -189,7 +189,7 @@ function [Twb,Teq,epott]=WetBulb(TemperatureC,Pressure,Humidity,HumidityMode,Con
 
     if ConvergenceMode
         
-        convergence = 0.00001; maxiter=20000;
+        convergence = 0.0001; maxiter=100000;
 
         [es_mb_wb_temp,rs_wb_temp,de_mbdwb_temp, dlnes_mbdwb_temp, rsdwb_temp, foftk_wb_temp, fdwb_temp]=QSat_2(wb_temp+C, Pressure);
         delta=real((foftk_wb_temp - X)./fdwb_temp);
