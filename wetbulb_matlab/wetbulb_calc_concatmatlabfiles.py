@@ -21,6 +21,8 @@ from cf_units import Unit
 
 import cartopy.crs as ccrs
 
+import os
+
 import glob
 
 import copy
@@ -42,16 +44,32 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 #%% Import data
 #update model name and scenario name in filenames, and saved path at end of script
 
-#temp_orig = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_rcp85.nc')
-temp_orig = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_historical_p25grid.nc')
+model = 'cp4'
+scen = 'histo'
+m_scen = model + '_' + scen
+
+if scen == 'histo':
+    t_scen = 'historical'
+else:
+    t_scen = scen
+
+if model == 'p25':
+    temp_orig = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_p25_' + t_scen + '.nc')
+elif  model == 'cp4':
+    temp_orig = iris.load_cube('/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_' + t_scen + '_p25grid.nc')
 
 
 file_path = ('/nfs/a321/earsch/floods_heatwaves/processed/wetbulb_temp/')
-filenames = glob.glob(file_path + '*cp4_hist*part?.nc')
+filenames = glob.glob(file_path + '*{}*part?.nc'.format(m_scen))
 files = iris.cube.CubeList()
 for file in filenames:
     x = iris.load_cube(file)
-    files.append(x)
+    files.append(x)    
+
+print('Loading:')
+for f in filenames:
+    print(f)
+
     
 #%%
 
@@ -94,9 +112,14 @@ concat_regrid = concat_files.regrid(temp_orig[0], iris.analysis.AreaWeighted())
 #put data fromc conat files into P25 temp, so get coord info
 
 temp_orig.data[0:3600, :,:] = concat_regrid.data
+temp_new = temp_orig[0:3600]
 
 
 #%%
 
-iris.save(temp_orig, '/nfs/a321/earsch/floods_heatwaves/processed/wetbulb_temp/wb_cp4_daily_historical_wa.nc')
+save_name = '/nfs/a321/earsch/floods_heatwaves/processed/wetbulb_temp/wb_' + model + '_daily_' + t_scen + '_wa.nc'
+
+print('Saving as ', save_name)
+
+iris.save(temp_new, save_name)
 
