@@ -5,10 +5,14 @@
 %% Set up functions
 %change to folder where WetBulb.m is (function to calculate wetbulb
 %temperature)
-cd /nfs/see-fs-02_users/earsch/Documents/Leeds/Repos/floods_heatwaves/wetbulb_matlab;
+cd /nfs/see-fs-02_users/earsch/Documents/Leeds/Repos/floods_heatwaves/floods_heatwaves_shared/wetbulb_matlab;
 
 %% Set up input data
 % set model and scen, and then input file names
+
+%area
+%area = 'wa';
+area = 'pa'; %pan-africa
 
 %model
 model = 'p25';
@@ -18,8 +22,8 @@ model = 'p25';
 %note that temp goes up to 3660 (feb 2007) while pa and RHs only go up to
 %3600 (end up 2006) -> doesn't matter as drop last half of 2006 anyway, but
 %be aware that time length is different
-time_name = 'part3';
-timestart = 3001;
+time_name = 'part1';
+timestart = 1;
 timeend = 3600;
 
 %scenarios
@@ -42,7 +46,7 @@ hus_file = strcat('/nfs/a321/earsch/floods_heatwaves/input_data/humidity/spechum
 
 % save info
 save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wetbulb_temp/wb_';
-file_name = strcat(save_path, model, '_', scen, '_', time_name, '.nc');
+file_name = strcat(save_path, model, '_', scen, '_', time_name, '_', area, '.nc');
 
 
 
@@ -70,6 +74,13 @@ end_loc = [(lonend-lonstart)+1 (latend-latstart)+1 (timeend - timestart)+1];
 
 len_time = size(time);
 len_time = len_time(1);
+
+%grid
+if strcmp(area,'pa') == true
+    start_loc = [1 1 timestart];
+    end_loc = [Inf Inf (timeend - timestart) + 1];
+end
+
 
 %% Import data, extracting to west africa
 
