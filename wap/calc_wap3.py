@@ -63,7 +63,11 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/'     
 mod = 'p25'
 scen = 'historical'
+area = 'pan_africa'
+#araa = 'wa'
 
+print('Loading...')
+print(mod , scen, sep = '')
 
 #P25 
 pr = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_p25_daily_histo.nc')
@@ -97,22 +101,26 @@ ls_regrid =ls_regrid[0,0]
 
 #%% Extract area
 
-#chagne save path if extra to region
-save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/'    
-
-
-min_lat = 3.5
-max_lat = 20.0
-min_lon = -20.0
-max_lon = 16.0 
-
-
-cons = iris.Constraint(latitude = lambda cell: min_lat < cell < max_lat,
-                       longitude = lambda cell: min_lon < cell < max_lon)
-
-pr = pr.extract(cons)
-
-ls_regrid = ls_regrid.extract(cons)
+if area == 'wa':
+    print('Extracting to West Africa')
+    #chagne save path if extra to region
+    save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/'    
+    
+    
+    min_lat = 3.5
+    max_lat = 20.0
+    min_lon = -20.0
+    max_lon = 16.0 
+    
+    
+    cons = iris.Constraint(latitude = lambda cell: min_lat < cell < max_lat,
+                           longitude = lambda cell: min_lon < cell < max_lon)
+    
+    pr = pr.extract(cons)
+    
+    ls_regrid = ls_regrid.extract(cons)
+else:
+    print('Preparing for pan-africa')
 
 
 #%% calc WAP
@@ -195,24 +203,40 @@ def apply_wap(pr_cube, window, alpha, ls):
 window = 44
 alpha = 0.9
     
-wap_cube = apply_wap(pr, window, alpha, ls_regrid)
-
-#save data
-
-save_name = save_path + mod + '_' + scen + '_w' + str(window) + '_a' + str(alpha) + '.nc'
-
-iris.save(wap_cube, save_name)
+print('calculating wap with:')
+print('Window', window, sep = ' ')
+print('Alpha', alpha, sep = '')
 
 
-#%% check
+if area == 'wa':
+    wap_cube = apply_wap(pr, window, alpha, ls_regrid)
 
-y, x = 48,7
-t2 = 100
-t1 = t2 - 44
+    #save data
+    
+    print('Saving data')
+    save_name = save_path + mod + '_' + scen + '_w' + str(window) + '_a' + str(alpha) + '.nc'
+    
+    iris.save(wap_cube, save_name)
+else:
+    #for pan africa split into parts (need to do all timesteps at once for wap due to window)
+    dims = pr.shape
+    
+    start_idx = np.arange(0, dims[1], 50)
+    end_idx = start_idx + 50
+    end_idx[-1] = dims[1]
+    
+    n_parts = len(start_idx)
+    for k in np.arange(n_parts):
+        print('Starting wap part ', k)
+        new_pr = pr[:, start_idx[k]:end_idx[k], :]
+        wap_cube = apply_wap(new_pr, window, alpha, ls_regrid)
+        
+        print('Saving wap part ', k)
+        save_name = save_path + mod + '_' + scen + '_w' + str(window) + '_a' + str(alpha) + '_part' + str(k) + '.nc'
+        
+        iris.save(wap_cube, save_name)
+    
 
-#plt.plot(pr[t1:t2, y, x].data)
-#plt.plot(wap_cube[t1:t2, y, x].data)
+    
 
-plt.plot(pr_in[t1:t2].data, label = 'pr')
-plt.plot(wap[t1:t2].data, label = 'wap')
-plt.legend()
+
