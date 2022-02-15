@@ -75,20 +75,20 @@ Required variables: <br />
 
 ## Progress
 ### West Africa 
-- Wetbulb temperature: complete
-- Heatwaves: complete 
-- WAP: complete
-- Floods: complete 
-- Combined events: complete 
+- [x] Wetbulb temperature
+- [x] Heatwaves
+- [x] WAP
+- [x] Floods
+- [x] Combined events
 
-### Pan Africa: <br />
-- Wetbulb temperature: Not started <br />
-- Heatwaves:
-  - Td complete, <br />
-  - Tw not statrted <br />
-- WAP: Not started <br />
-- Floods: Not started <br />
-- Combined events: Not started <br />
+### Pan Africa: 
+- [ ] Wetbulb temperature: Not started 
+- [ ] Heatwaves:
+  - [x] Td complete
+  - [ ] Tw 
+- [ ] WAP
+- [ ] Floods
+- [ ] Combined events
 
 ## References <br />
 
