@@ -83,8 +83,9 @@ Required variables: <br />
 
 ### Pan Africa: <br />
 - Wetbulb temperature: Not started <br />
-- Heatwaves: - Td complete, <br />
-	   - Tw not statrted <br />
+- Heatwaves:
+  - Td complete, <br />
+  - Tw not statrted <br />
 - WAP: Not started <br />
 - Floods: Not started <br />
 - Combined events: Not started <br />
