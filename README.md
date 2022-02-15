@@ -1,4 +1,4 @@
-Instructions for calculating combined flood-heatwave events <br />
+# Instructions for calculating combined flood-heatwave events <br />
 Heatwaves - based on dry bulb and wet bulb heatwaves. Calculated using Russo 2015 method. <br />
 Floods - calcualated based on WAP method (Lu 2009 and Chen 2021) <br />
 
@@ -10,7 +10,7 @@ Required variables: <br />
 -specific humidity (surface) <br />
 -preciptiation <br />
 
-Process <br />
+## Process <br />
 1. 	If not already, calcualte daily means from hourly data. <br />
 	Ensure everything on same grid. <br />
 
@@ -73,7 +73,23 @@ Process <br />
 	Scripts (in combined_events repo): <br />
 	combiend events.py <br />
 
-References: <br />
+## Progress
+West Africa: <br />
+Wetbulb temperature: complete <br />
+Heatwaves: complete <br />
+WAP: complete <br />
+Floods: complete <br />
+Combined events: complete <br />
+
+Pan Africa: <br />
+Wetbulb temperature: Not started <br />
+Heatwaves: Td complete, <br />
+	   Tw not statrted <br />
+WAP: Not started <br />
+Floods: Not started <br />
+Combined events: Not started <br />
+
+## References: <br />
 
 Chen, Y., Z. Liao, Y. Shi, Y. Tian, and P. Zhai. 2021. Detectable Increases in Sequential Flood-Heatwave Events Across China During 1961–2018. Geophysical Research Letters 48:1–10. <br />
 
