@@ -74,22 +74,22 @@ Required variables: <br />
 	combiend events.py <br />
 
 ## Progress
-West Africa: <br />
-Wetbulb temperature: complete <br />
-Heatwaves: complete <br />
-WAP: complete <br />
-Floods: complete <br />
-Combined events: complete <br />
+### West Africa 
+-Wetbulb temperature: complete
+-Heatwaves: complete 
+-WAP: complete
+-Floods: complete 
+-Combined events: complete 
 
-Pan Africa: <br />
-Wetbulb temperature: Not started <br />
-Heatwaves: Td complete, <br />
-	   Tw not statrted <br />
-WAP: Not started <br />
-Floods: Not started <br />
-Combined events: Not started <br />
+### Pan Africa: <br />
+-Wetbulb temperature: Not started <br />
+-Heatwaves: -Td complete, <br />
+	   -Tw not statrted <br />
+-WAP: Not started <br />
+-Floods: Not started <br />
+-Combined events: Not started <br />
 
-## References: <br />
+## References <br />
 
 Chen, Y., Z. Liao, Y. Shi, Y. Tian, and P. Zhai. 2021. Detectable Increases in Sequential Flood-Heatwave Events Across China During 1961–2018. Geophysical Research Letters 48:1–10. <br />
 
