@@ -60,11 +60,11 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 #%% Load data
    
 # set up save details based on laoded data
-save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/'     
+save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/wap/'     
 mod = 'p25'
-scen = 'historical'
+scen = 'rcp85'
 area = 'pan_africa'
-#araa = 'wa'
+#area = 'wa'
 
 print('Loading...')
 print(mod , scen, sep = '')
@@ -104,7 +104,7 @@ ls_regrid =ls_regrid[0,0]
 if area == 'wa':
     print('Extracting to West Africa')
     #chagne save path if extra to region
-    save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/'    
+    save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/wap/'    
     
     
     min_lat = 3.5
@@ -226,13 +226,13 @@ else:
     end_idx[-1] = dims[1]
     
     n_parts = len(start_idx)
-    for k in np.arange(n_parts):
+    for k in np.arange(6, n_parts):
         print('Starting wap part ', k)
         new_pr = pr[:, start_idx[k]:end_idx[k], :]
         wap_cube = apply_wap(new_pr, window, alpha, ls_regrid)
         
         print('Saving wap part ', k)
-        save_name = save_path + mod + '_' + scen + '_w' + str(window) + '_a' + str(alpha) + '_part' + str(k) + '.nc'
+        save_name = save_path + 'partial_files/' + mod + '_' + scen + '_w' + str(window) + '_a' + str(alpha) + '_part' + str(k) + '.nc'
         
         iris.save(wap_cube, save_name)
     
