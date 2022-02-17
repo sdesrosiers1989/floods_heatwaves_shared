@@ -70,7 +70,12 @@ print('Loading...')
 print(mod , scen, sep = '')
 
 #P25 
-pr = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_p25_daily_histo.nc')
+
+file_name = '/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_' + mod + '_daily_' + scen + '.nc'
+
+pr = iris.load_cube(file_name)
+
+#pr = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_p25_daily_histo.nc')
 #pr = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_p25_daily_rcp85.nc')
 
 #CP4
@@ -226,7 +231,7 @@ else:
     end_idx[-1] = dims[1]
     
     n_parts = len(start_idx)
-    for k in np.arange(6, n_parts):
+    for k in np.arange(0, n_parts):
         print('Starting wap part ', k)
         new_pr = pr[:, start_idx[k]:end_idx[k], :]
         wap_cube = apply_wap(new_pr, window, alpha, ls_regrid)
