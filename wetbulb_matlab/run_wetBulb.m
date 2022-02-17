@@ -29,8 +29,8 @@ timeend = 3600;
 %scenarios
 scen = 'histo';
 t_scen = 'historical';
-% scen = 'rcp85';
-% t_scen = 'rcp85';
+%scen = 'rcp85';
+%t_scen = 'rcp85';
 
 %grid
 if strcmp(model,'cp4') == true
@@ -62,6 +62,8 @@ lons = ncread(temp_file, 'longitude');
 lats = ncread(temp_file, 'latitude');
 time = ncread(temp_file, 'time');
 
+len_lons =  size(lons)
+len_lats = size(lats)
 
 latstart = find(lats > min_lat, 1, 'first');
 latend = find(lats < max_lat, 1, 'last');
@@ -77,6 +79,11 @@ len_time = len_time(1);
 
 %grid
 if strcmp(area,'pa') == true
+    latstart = 1
+    lonstart = 1
+    lonend = len_lons(1)
+    latend = len_lats(1)
+    
     start_loc = [1 1 timestart];
     end_loc = [Inf Inf (timeend - timestart) + 1];
 end
@@ -122,8 +129,8 @@ cmode = 'NETCDF4'; %will overwrite existing files, create netcdf4 file
 new_nc = netcdf.create(file_name, cmode);
 
 %create dimensions
-londim = netcdf.defDim(new_nc, 'longitude', end_loc(1));
-latdim = netcdf.defDim(new_nc, 'latitude', end_loc(2));
+londim = netcdf.defDim(new_nc, 'longitude', lonend);
+latdim = netcdf.defDim(new_nc, 'latitude', latend);
 timedim = netcdf.defDim(new_nc, 'time', end_loc(3));
 
 %create wb variable
@@ -140,10 +147,14 @@ new_lons = lons(lonstart:lonend);
 new_lats = lats(latstart:latend);
 new_times = time(timestart:timeend);
 
+%%
+
 netcdf.putVar(new_nc, wb_var, wb);
 netcdf.putVar(new_nc, lon_var, new_lons);
 netcdf.putVar(new_nc, lat_var, new_lats);
 netcdf.putVar(new_nc, time_var, new_times);
 
 netcdf.close(new_nc);
+
+disp('Complete')
 
