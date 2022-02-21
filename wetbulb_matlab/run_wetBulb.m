@@ -16,7 +16,7 @@ area = 'pa'; %pan-africa
 
 %model
 model = 'p25';
-%model = 'cp4';
+model = 'cp4';
 
 %set year (note matlab starts at 1, indexing is inclusive)
 %note that temp goes up to 3660 (feb 2007) while pa and RHs only go up to
@@ -29,8 +29,8 @@ timeend = 3600;
 %scenarios
 scen = 'histo';
 t_scen = 'historical';
-%scen = 'rcp85';
-%t_scen = 'rcp85';
+scen = 'rcp85';
+t_scen = 'rcp85';
 
 %grid
 if strcmp(model,'cp4') == true
