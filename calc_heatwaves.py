@@ -64,6 +64,7 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 temp_type = 'tw' # currently only ahve fro West Africa
 mod = 'p25'
 scen = 'historical'
+area = 'pan_africa'
 
 #%% Load data basedon user inputs
 
@@ -78,7 +79,7 @@ if temp_type == 'td':
     elif mod == 'cp4':
         fname = '/nfs/a321/earsch/Tanga/Data/CP4_Processed/tas/tas_day_cp4_' + scen + '_p25grid.nc'
 elif temp_type == 'tw':
-    fname = '/nfs/a321/earsch/floods_heatwaves/processed/wetbulb_temp/wb_' + mod + '_daily_'  + scen + '_wa.nc'
+    fname = '/nfs/a321/earsch/floods_heatwaves/processed/wetbulb_temp/' + area + '/wb_' + mod + '_daily_'  + scen + '*.nc'
        
 temp = iris.load_cube(fname)
 
@@ -111,21 +112,23 @@ ls_regrid =ls_regrid[0,0]
 #%% Extract area
 # change save path if run
 
-save_path = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/west_africa/' + temp_type + '/attributes/'  
-save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/west_africa/' + temp_type + '/thres/'  
+if area == 'west_africa':
 
-min_lat = 3.5
-max_lat = 20.0
-min_lon = -20.0
-max_lon = 16.0 
-
-
-cons = iris.Constraint(latitude = lambda cell: min_lat < cell < max_lat,
-                       longitude = lambda cell: min_lon < cell < max_lon)
-
-temp = temp.extract(cons)
-
-ls_regrid = ls_regrid.extract(cons)
+    save_path = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/west_africa/' + temp_type + '/attributes/'  
+    save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/west_africa/' + temp_type + '/thres/'  
+    
+    min_lat = 3.5
+    max_lat = 20.0
+    min_lon = -20.0
+    max_lon = 16.0 
+    
+    
+    cons = iris.Constraint(latitude = lambda cell: min_lat < cell < max_lat,
+                           longitude = lambda cell: min_lon < cell < max_lon)
+    
+    temp = temp.extract(cons)
+    
+    ls_regrid = ls_regrid.extract(cons)
 
 #%% drop first half of 1997 and second hafl of 2006
 # 1st June 1997 = 150
