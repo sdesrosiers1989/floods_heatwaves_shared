@@ -82,7 +82,7 @@ Inputs:
 - [x] Combined events
 
 ### Pan Africa
-- [ ] Wetbulb temperature
+- [X] Wetbulb temperature
 - [ ] Heatwaves:
   - [x] Td 
   - [ ] Tw 
