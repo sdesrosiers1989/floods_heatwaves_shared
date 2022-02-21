@@ -61,8 +61,8 @@ proj = ccrs.PlateCarree(central_longitude = 38)
    
 # set up save details based on laoded data
 save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/wap/'     
-mod = 'p25'
-scen = 'rcp85'
+mod = 'cp4'
+scen =  'histo'
 area = 'pan_africa'
 #area = 'wa'
 
@@ -71,15 +71,15 @@ print(mod , scen, sep = '')
 
 #P25 
 
-file_name = '/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_' + mod + '_daily_' + scen + '.nc'
+#file_name = '/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_' + mod + '_daily_' + scen + '.nc'
 
-pr = iris.load_cube(file_name)
+#pr = iris.load_cube(file_name)
 
 #pr = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_p25_daily_histo.nc')
 #pr = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_p25_daily_rcp85.nc')
 
 #CP4
-#pr = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_cp4_p25grid_histo.nc')
+pr = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_cp4_p25grid_histo.nc')
 #pr = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/input_data/pr/pr_cp4_p25grid_rcp85.nc')
 
 #convert to mm/day
