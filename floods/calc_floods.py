@@ -58,14 +58,13 @@ save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/floods/'
 save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/thres/'  
 mod = 'p25'
 scen = 'historical'
+area = 'pan_africa'
 
-#P25 
-wap = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/wap/p25*hist*')
-#wap = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/wap/p25*rcp85*')
+fname = '/nfs/a321/earsch/floods_heatwaves/processed/wap/' + area + '/wap/' + mod + '_' + scen + '*.nc'
+wap = iris.load_cube(fname)
 
-#CP4
-#wap = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/wap/cp4*hist*')
-#wap = iris.load_cube('/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/wap/cp4*rcp85*')
+
+
 
 #add aux coords
 wap.add_aux_coord(iris.coords.AuxCoord(mod, long_name = 'model'))
@@ -87,21 +86,23 @@ ls_regrid =ls_regrid[0,0]
 #%% Extract area
 # change save path if run
 
-save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/floods/' 
-save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/thres/'
+if area == 'west_africa':
 
-min_lat = 3.5
-max_lat = 20.0
-min_lon = -20.0
-max_lon = 16.0 
-
-
-cons = iris.Constraint(latitude = lambda cell: min_lat < cell < max_lat,
-                       longitude = lambda cell: min_lon < cell < max_lon)
-
-wap = wap.extract(cons)
-
-ls_regrid = ls_regrid.extract(cons)
+    save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/floods/' 
+    save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/thres/'
+    
+    min_lat = 3.5
+    max_lat = 20.0
+    min_lon = -20.0
+    max_lon = 16.0 
+    
+    
+    cons = iris.Constraint(latitude = lambda cell: min_lat < cell < max_lat,
+                           longitude = lambda cell: min_lon < cell < max_lon)
+    
+    wap = wap.extract(cons)
+    
+    ls_regrid = ls_regrid.extract(cons)
 #%% drop first half of 1997 and second hafl of 2006
 # 1st June 1997 = 150
 # 1st June 2006 = 3390
@@ -123,7 +124,7 @@ def calc_thres(cube, per, save_path, mod, scen, save = True):
     return thres
 
 
-def get_floods(cube, wap_thres, ls):
+def get_floods(cube, wap_thres, ls, restrict = 0.0):
     ''' Calculate floods events
         Defined as wap > 95th percentile
         Calcualted only for land points
