@@ -83,9 +83,7 @@ Inputs:
 
 ### Pan Africa
 - [X] Wetbulb temperature
-- [ ] Heatwaves:
-  - [x] Td 
-  - [ ] Tw 
+- [X] Heatwaves
 - [ ] WAP
 - [ ] Floods
 - [ ] Combined events
