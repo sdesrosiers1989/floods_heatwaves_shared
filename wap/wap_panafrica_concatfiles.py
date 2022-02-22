@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
-from iris.experimental.equalise_cubes import equalise_attributes
+from iris.util import equalise_attributes
 import iris.coord_categorisation
 from cf_units import Unit
 
@@ -50,8 +50,8 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 #%% Import data
 #update model name and scenario name in filenames, and saved path at end of script
 
-model = 'p25'
-scen = 'historical'
+model = 'cp4'
+scen = 'rcp85'
 wind_alpha = 'w44_a0.9'
 m_scen = model + '_' + scen + '_' + wind_alpha
 
@@ -70,6 +70,7 @@ for f in filenames:
     
 #%%
 
+equalise_attributes(files)
 concat_files = files.concatenate_cube()
 
 
