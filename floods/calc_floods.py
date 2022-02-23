@@ -49,8 +49,8 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 # set up save details based on laoded data
 save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/floods/restrict/'  
 save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/thres/'  
-mod = 'p25'
-scen = 'rcp85'
+mod = 'cp4'
+scen = 'historical'
 area = 'west_africa'
 
 fname = '/nfs/a321/earsch/floods_heatwaves/processed/wap/' + area + '/wap/' + mod + '_' + scen + '*.nc'
@@ -81,7 +81,7 @@ ls_regrid =ls_regrid[0,0]
 
 if area == 'west_africa':
 
-    save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/floods/' 
+    save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/floods/restrict/' 
     save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/wap/west_africa/thres/'
     
     min_lat = 3.5
@@ -115,7 +115,7 @@ per_95 = f.calc_thres(wap, 95, save_path_thres, mod, scen)
 restrict = 10.0
 
 #floods
-output = f.get_floods(wap, per_95, ls_regrid)
+output = f.get_floods(wap, per_95, ls_regrid, restrict =  restrict)
 
 
 #save data
