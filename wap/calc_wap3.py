@@ -168,6 +168,7 @@ def apply_wap(pr_cube, window, alpha, ls):
     '''
     
     dims = pr_cube.shape
+    print(dims)
     
     #create cube for saving data
     wap_cube = copy.deepcopy(pr_cube)
@@ -206,18 +207,40 @@ window = 44
 alpha = 0.9
     
 print('calculating wap with:')
-print('Window', window, sep = ' ')
-print('Alpha', alpha, sep = '')
+print('Window ', window, sep = ' ')
+print('Alpha ', alpha, sep = '')
 
 
+if area == 'wa':
+    wap_cube = apply_wap(pr, window, alpha, ls_regrid)
 
-wap_cube = apply_wap(pr, window, alpha, ls_regrid)
-
-#save data
-
-print('Saving data')
-save_name = save_path + mod + '_' + scen + '_w' + str(window) + '_a' + str(alpha) + '.nc'
-
-iris.save(wap_cube, save_name)
+    #save data
+    
+    print('Saving data')
+    save_name = save_path + mod + '_' + scen + '_w' + str(window) + '_a' + str(alpha) + '.nc'
+    
+    iris.save(wap_cube, save_name)
+else:
+    #for pan africa split into parts (need to do all timesteps at once for wap due to window)
+    pr_dims = pr.shape
+    
+    print(pr_dims)
+    
+    start_idx = np.arange(0, pr_dims[1], 50)
+    end_idx = start_idx + 50
+    end_idx[-1] = pr_dims[1]
+    
+    n_parts = len(start_idx)
+    for k in np.arange(0, n_parts):
+        print('Starting wap part ', k, start_idx[k], end_idx[k])
+        new_pr = pr[:, start_idx[k]:end_idx[k], :]
+        new_ls = ls_regrid[start_idx[k]:end_idx[k], :]
+        
+        wap_cube = apply_wap(new_pr, window, alpha, new_ls)
+        
+        print('Saving wap part ', k)
+        save_name = save_path + 'partial_files/' + mod + '_' + scen + '_w' + str(window) + '_a' + str(alpha) + '_part' + str(k) + '.nc'
+        
+        iris.save(wap_cube, save_name)
 
 
