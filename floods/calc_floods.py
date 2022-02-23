@@ -164,18 +164,23 @@ def get_floods(cube, wap_thres, ls, restrict = 0.0):
     #find flood events
     floods = copy.deepcopy(cube)
     floods.data = np.where(floods.data > wap_thres.data, 1.0, 0.0)     
+    
+    wap_greater_restrict = copy.deepcopy(cube)
+    wap_greater_restrict.data = np.where(wap_greater_restrict.data >= restrict, 1.0, 0.0) 
 
     for y in range(nlat):
         for x in range(nlon):
             if ls[y,x].data > 0.5:
+        
                 
                 f_loc = floods[:, y, x].data
+                r_loc = wap_greater_restrict[:,y,x].data
                  
                 f=np.zeros(nt+2) # add an element at beginning and end compared to floods
                 
-                #find locations of floods
-                fidx = np.where(f_loc == 1.0)
-                
+                #find locations of floods (both threshold and mm restirction are true)
+                fidx = np.where(f_loc + r_loc == 2.0)
+           
                 f[fidx[0] + 1] = 1 # add 1 to every index after flood defined
 
                 diffs=np.diff(f) 
@@ -233,6 +238,8 @@ per_95 = calc_thres(wap, 95, save_path_thres, mod, scen)
 
 #%%
 
+restrict = 10.0
+
 #floods
 output = get_floods(wap, per_95, ls_regrid)
 
@@ -243,6 +250,6 @@ var_names = ['floods', 'duration', 'ndays', 'nevents', 'start', 'end']
 
 for i in np.arange(len(output)):
 
-    save_name = save_path +  var_names[i] + '_' + mod + '_' + scen + '.nc'
+    save_name = save_path +  var_names[i] + '_' + mod + '_' + scen + '_r' + str(restrict) +'.nc'
 
     iris.save(output[i], save_name)
