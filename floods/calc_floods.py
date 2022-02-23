@@ -36,7 +36,7 @@ import glob
 
 #Import my functions
 import sys
-sys.path.append('/nfs/see-fs-02_users/earsch/Documents/Leeds/Repos/floods_heatwaves/floods_heatwaves_shared/floods/')
+sys.path.append('/nfs/see-fs-02_users/earsch/Documents/Leeds/Repos/floods_heatwaves/floods_heatwaves_shared/floods')
 import flood_functions as f
 
 
@@ -47,10 +47,10 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 #%% Load data
 
 # set up save details based on laoded data
-save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/floods/'  
+save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/floods/restrict/'  
 save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/thres/'  
 mod = 'p25'
-scen = 'historical'
+scen = 'rcp85'
 area = 'west_africa'
 
 fname = '/nfs/a321/earsch/floods_heatwaves/processed/wap/' + area + '/wap/' + mod + '_' + scen + '*.nc'
