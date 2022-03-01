@@ -1,5 +1,5 @@
 # Instructions for calculating combined flood-heatwave events <br />
-Heatwaves - based on dry bulb and wet bulb heatwaves. Calculated using Russo 2015 method. <br />
+Heatwaves - based on dry bulb and wet bulb heatwaves. Calculated using Russo 2015 method. Also option to calculate only hotdays (individual hot days) instead) <br />
 Floods - calcualated based on WAP method (Lu 2009 and Chen 2021) <br />
 
 Inputs:
@@ -34,18 +34,24 @@ Inputs:
 
 	Scripts (heatwaves): <br />
 	calc_heatwaves.py <br />
+	
+	Alternative: calculate hot days instead <br />
+	Scripts (hotdays): <br />
+	calc_hotdays.py <br />
 
 
 4. Calculate WAP <br />
 	Calculate weighted area precipitation, based on Lu 2009 method. <br />
 	Currently using alpha = 0.9 and window size = 44 days, but script allows for change. <br />
 	Alpha = 0.9, weight given to previous days. Amounts to precip after day 44 having very minimal weight (so don't bother including) <br />
+	Pan-africa: WAP calculated in sections and saved (otherwise takes too long) - files then concatenated into one <br />
 
 	Inputs: <br />
 	Daily pr <br />
 
-	Scripts: <br />
-	calc_wap3.py (wap folder) <br />
+	Scripts (wap folder): <br />
+	calc_wap3.py <br />
+	wap_panafrica_concatfiles.py <br />
 
 5. Calculate floods <br />
 	Calculate floods based on 95th percentile of WAP, based on Chen 2021 <br />
@@ -56,6 +62,7 @@ Inputs:
 	Scripts (floods folder): <br />
 	calc_floods.py<br />
 	calc_floods_rcp85.py<br />
+	floods_panafrica_concatfiles.py <br/>
 
 6. Calculate combined events <br />
 	Calculate combined flood-heatwave events, including sameday events, floods before heatwaves and floods after heatwaves <br />
@@ -84,7 +91,8 @@ Inputs:
 ### Pan Africa
 - [X] Wetbulb temperature
 - [X] Heatwaves
-- [ ] WAP
+- [x] Hot days
+- [X] WAP
 - [ ] Floods
 - [ ] Combined events
 
