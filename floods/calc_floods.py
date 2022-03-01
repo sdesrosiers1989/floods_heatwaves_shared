@@ -49,9 +49,9 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 # set up save details based on laoded data
 save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/floods/restrict/'  
 save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/thres/'  
-mod = 'cp4'
+mod = 'p25'
 scen = 'historical'
-area = 'west_africa'
+area = 'pan_africa'
 
 fname = '/nfs/a321/earsch/floods_heatwaves/processed/wap/' + area + '/wap/' + mod + '_' + scen + '*.nc'
 wap = iris.load_cube(fname)
@@ -115,15 +115,47 @@ per_95 = f.calc_thres(wap, 95, save_path_thres, mod, scen)
 restrict = 10.0
 
 #floods
-output = f.get_floods(wap, per_95, ls_regrid, restrict =  restrict)
-
-
-#save data
-var_names = ['floods', 'duration', 'ndays', 'nevents', 'start', 'end']
-
-
-for i in np.arange(len(output)):
-
-    save_name = save_path +  var_names[i] + '_' + mod + '_' + scen + '_r' + str(restrict) +'.nc'
-
-    iris.save(output[i], save_name)
+if area == 'west_africa':
+    output = f.get_floods(wap, per_95, ls_regrid, restrict =  restrict)
+    
+    
+    #save data
+    var_names = ['floods', 'duration', 'ndays', 'nevents', 'start', 'end']
+    
+    
+    for i in np.arange(len(output)):
+    
+        save_name = save_path +  var_names[i] + '_' + mod + '_' + scen + '_r' + str(restrict) +'.nc'
+    
+        iris.save(output[i], save_name)
+else:
+    #for pan africa split into parts (need to do all timesteps at once for wap due to window)
+    wap_dims = wap.shape
+    
+    #print(pr_dims)
+    
+    start_idx = np.arange(0, wap_dims[1], 50)
+    end_idx = start_idx + 50
+    end_idx[-1] = wap_dims[1]
+    
+    n_parts = len(start_idx)
+    for k in np.arange(0, n_parts):
+        print('Starting flood part ', k, start_idx[k], end_idx[k])
+        new_wap = wap[:, start_idx[k]:end_idx[k], :]
+        new_ls = ls_regrid[start_idx[k]:end_idx[k], :]
+        new_per = per_95[start_idx[k]:end_idx[k], :]
+        
+        output = f.get_floods(new_wap, new_per, new_ls, restrict =  restrict)
+                
+        print('Saving floods part ', k)
+        
+        
+        #save data
+        var_names = ['floods', 'duration', 'ndays', 'nevents', 'start', 'end']
+        
+        
+        for i in np.arange(len(output)):
+        
+            save_name = save_path + 'partial_files/' + var_names[i] + '_' + mod + '_' + scen + '_r' + str(restrict) + '_part' + str(k) + '.nc'
+        
+            iris.save(output[i], save_name)
