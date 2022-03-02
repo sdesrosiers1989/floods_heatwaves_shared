@@ -79,7 +79,7 @@ def concat_files(model, scen, file_path, save_path, var):
     concat_files = files.concatenate_cube()
 
 
-    save_name = save_path + var + '_' + model + '_' + scen + '_restrict10.nc'
+    save_name = save_path + var + '_' + model + '_' + scen + '_restrict10.0.nc'
     
     print('Saving as ', save_name)
     
