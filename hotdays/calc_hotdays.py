@@ -56,7 +56,7 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 temp_type = 'td'
 #temp_type = 'tw' 
 mod = 'p25'
-scen = 'rcp85'
+#scen = 'rcp85'
 scen = 'historical'
 area = 'pan_africa'
 hd_thres = '95' # threshold which defines hotdays
@@ -104,7 +104,7 @@ temp = temp[150:3390,:,:]
 
 #%%
 
-def get_heatwave(cube, thres):
+def get_heatwave(cube, thres, ls):
     ''' Calculate locations of hotdays, and total number of hotdays
         
         cube = input temperature cube
@@ -120,8 +120,69 @@ def get_heatwave(cube, thres):
     # total number of ho days for each gridpoint within time series
     count_hot_days = hotdays.collapsed('time', iris.analysis.SUM)
     
+    #start and end of multiday events
+    shape=np.shape(cube)
+    nt=shape[0]
+    nlat=shape[1]
+    nlon=shape[2]
+    
+    count_hd_event = copy.deepcopy(cube[0])
+    count_hd_event.data = np.zeros((nlat,nlon))
+    start_hd_event = copy.deepcopy(cube)
+    start_hd_event.data = np.zeros((nt,nlat,nlon))
+    end_hd_event = copy.deepcopy(cube)
+    end_hd_event.data = np.zeros((nt,nlat,nlon))
+    hd_duration = copy.deepcopy(cube)
+    hd_duration.data = np.zeros((nt,nlat,nlon))
 
-    return [hotdays, count_hot_days]
+    for y in range(nlat):
+        for x in range(nlon):
+            if ls[y,x].data > 0.5:
+        
+                
+                h_loc = hotdays[:, y, x].data
+                 
+                h=np.zeros(nt+2) # add an element at beginning and end compared to floods
+                
+                hidx = np.where(h_loc == 1.0)
+           
+                h[hidx[0] + 1] = 1 # add 1 to every index after flood defined
+
+                diffs=np.diff(h) 
+                # this is 1 where it becomes flood and -1 where it becomes not flood 
+                # and 0 where it stays the same
+                
+                # get indices where changes occur and find length of flood events
+                start_hd=np.where(diffs>0)[0]
+                end_hd=np.where(diffs<0)[0] # end flood day - day flood ends (not a flood day)
+                nstart=len(start_hd)
+                #nend=len(end_hot)
+                len_hd=end_hd-start_hd
+                
+               #number of individual flood events
+                count_hd_event.data[y,x] = nstart
+
+                # hd_duration:  cube with length of hotday events at first hotday
+
+                for i in range(nstart):
+    
+                    #flood duration
+                    hd_duration.data[start_hd[i], y,x]=len_hd[i]
+                    
+                    
+                    #assign 1s to start and end dates of heatwaves
+                    start_hd_event.data[start_hd[i], y,x] = 1
+                    end_hd_event.data[end_hd[i] - 1, y,x] = 1 # last day of hotday event, 
+                                                                    # is a hot day
+                    
+          
+                        
+                        
+                        
+
+    return [hotdays, hd_duration, count_hot_days, count_hd_event, start_hd_event, end_hd_event]
+
+
 
 
 
@@ -132,7 +193,7 @@ def get_heatwave(cube, thres):
 output = get_heatwave(temp, thres)
 
 #save data
-var_names = ['hotdays', 'ndays']
+var_names =  ['hotdays', 'duration', 'ndays', 'nevents', 'start', 'end']
 
 
 for i in np.arange(len(output)):
