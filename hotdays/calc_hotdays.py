@@ -92,7 +92,16 @@ temp.convert_units('celsius')
 #load threshold 
 thres = iris.load_cube(file_path_thres + mod + '_historical_' + hd_thres + '.nc')
 
-
+#import landsea mask
+cs = temp.coord_system(iris.coord_systems.CoordSystem)
+ls = iris.load_cube('/nfs/a277/IMPALA/data/4km/ANCILS/landseamask_ancil_4km_regrid.nc')
+ls.coord('longitude').points = ls.coord('longitude').points - 360
+ls.coord('longitude').guess_bounds()
+ls.coord('latitude').guess_bounds()
+ls.coord(axis='x').coord_system = cs
+ls.coord(axis='y').coord_system = cs
+ls_regrid = ls.regrid(temp, iris.analysis.AreaWeighted())
+ls_regrid =ls_regrid[0,0]
 
 #%% drop first half of 1997 and second hafl of 2006
 # 1st June 1997 = 150
@@ -190,7 +199,7 @@ def get_heatwave(cube, thres, ls):
 #calculate hotdays
 
 
-output = get_heatwave(temp, thres)
+output = get_heatwave(temp, thres, ls_regrid)
 
 #save data
 var_names =  ['hotdays', 'duration', 'ndays', 'nevents', 'start', 'end']
