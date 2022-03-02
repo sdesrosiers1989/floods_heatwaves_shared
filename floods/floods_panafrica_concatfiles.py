@@ -50,16 +50,16 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 #%% Import data
 #update model name and scenario name in filenames, and saved path at end of script
 
-model = 'cp4'
-scen = 'rcp85'
-scen = 'histo'
+model = 'p25'
+#scen = 'rcp85'
+scen = 'historical'
 
 
 
 var_names = ['floods', 'duration', 'ndays', 'nevents', 'start', 'end']
 
-file_path = '/nfs/a321/earsch/floods_heatwaves/processed/floods/pan_africa/floods/partial_files/'
-save_path = '/nfs/a321/earsch/floods_heatwaves/processed/floods/pan_africa/floods/'
+file_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/floods/restrict/partial_files/'
+save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/floods/restrict/'
 
 def concat_files(model, scen, file_path, save_path, var):
 
