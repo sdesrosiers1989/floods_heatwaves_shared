@@ -32,19 +32,10 @@ import cartopy.crs as ccrs
 
 import copy
 
-import glob
-
-import pandas as pd
-
-import matplotlib.pyplot as plt
-
 #Import my functions
 import sys
 sys.path.append('/nfs/see-fs-02_users/earsch/Documents/Leeds/Repos/Tanga/Plot_functions')
-import tanzania1 as tp
-sys.path.append('/nfs/see-fs-02_users/earsch/Documents/Leeds/Repos/Tanga/Onset_functions')
-from onset_functions import masking
-from onset_functions import find_season
+
 
 proj = ccrs.PlateCarree(central_longitude = 38)
 
@@ -55,7 +46,7 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 # set up save details based on laoded data
 temp_type = 'td'
 #temp_type = 'tw' 
-mod = 'p25'
+mod = 'cp4'
 #scen = 'rcp85'
 scen = 'historical'
 area = 'pan_africa'
@@ -98,6 +89,11 @@ ls = iris.load_cube('/nfs/a277/IMPALA/data/4km/ANCILS/landseamask_ancil_4km_regr
 ls.coord('longitude').points = ls.coord('longitude').points - 360
 ls.coord('longitude').guess_bounds()
 ls.coord('latitude').guess_bounds()
+try:
+	temp.coord('longitude').guess_bounds()
+	temp.coord('latitude').guess_bounds()
+except:
+	print('has bounds')
 ls.coord(axis='x').coord_system = cs
 ls.coord(axis='y').coord_system = cs
 ls_regrid = ls.regrid(temp, iris.analysis.AreaWeighted())
@@ -199,16 +195,48 @@ def get_heatwave(cube, thres, ls):
 #calculate hotdays
 
 
-output = get_heatwave(temp, thres, ls_regrid)
 
-#save data
-var_names =  ['hotdays', 'duration', 'ndays', 'nevents', 'start', 'end']
+if area == 'west_africa':
+    output = get_heatwave(temp, thres, ls_regrid)
 
-
-for i in np.arange(len(output)):
-
-    save_name = save_path + 'per' + hd_thres + '/' + var_names[i] + '_' + mod + '_' + scen + '.nc'
-
-    iris.save(output[i], save_name)
-
-
+    #save data
+    var_names =  ['hotdays', 'duration', 'ndays', 'nevents', 'start', 'end']
+    
+    
+    for i in np.arange(len(output)):
+    
+        save_name = save_path + 'per' + hd_thres + '/' + var_names[i] + '_' + mod + '_' + scen + '.nc'
+    
+        iris.save(output[i], save_name)
+else:
+    #for pan africa split into parts (need to do all timesteps at once for wap due to window)
+    print(mod, scen)
+    temp_dims = temp.shape
+    
+    #print(pr_dims)
+    
+    start_idx = np.arange(0, temp_dims[1], 50)
+    end_idx = start_idx + 50
+    end_idx[-1] = temp_dims[1]
+    
+    n_parts = len(start_idx)
+    for k in np.arange(0, n_parts):
+        print('Starting hotdays part ', k, start_idx[k], end_idx[k])
+        new_t = temp[:, start_idx[k]:end_idx[k], :]
+        new_ls = ls_regrid[start_idx[k]:end_idx[k], :]
+        new_per = thres[start_idx[k]:end_idx[k], :]
+        
+        output = get_heatwave(new_t, new_per, new_ls)
+                        
+        print('Saving hotdays part ', k)
+        
+        
+        #save data
+        var_names =  ['hotdays', 'duration', 'ndays', 'nevents', 'start', 'end']
+        
+        
+        for i in np.arange(len(output)):
+                            
+            save_name = save_path + 'per' + hd_thres + '/partial_files/' + var_names[i] + '_' + mod + '_' + scen + '_part' + str(k) + '.nc'
+    
+            iris.save(output[i], save_name)
