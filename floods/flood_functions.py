@@ -66,11 +66,15 @@ def get_floods(cube, wap_thres, ls, restrict = 0.0):
  
     
     #find flood events
-    floods = copy.deepcopy(cube)
-    floods.data = np.where(floods.data > wap_thres.data, 1.0, 0.0)     
+    floods_wap_thres = copy.deepcopy(cube)
+    floods_wap_thres.data = np.where(floods_wap_thres.data > wap_thres.data, 1.0, 0.0)     
     
     wap_greater_restrict = copy.deepcopy(cube)
     wap_greater_restrict.data = np.where(wap_greater_restrict.data >= restrict, 1.0, 0.0) 
+    
+    floods = copy.deepcopy(floods_wap_thres)
+    floods.data = floods.data + wap_greater_restrict.data
+    floods.data = np.where(floods.data == 2.0, 1.0, 0.0)
 
     for y in range(nlat):
         for x in range(nlon):
@@ -78,12 +82,10 @@ def get_floods(cube, wap_thres, ls, restrict = 0.0):
         
                 
                 f_loc = floods[:, y, x].data
-                r_loc = wap_greater_restrict[:,y,x].data
                  
                 f=np.zeros(nt+2) # add an element at beginning and end compared to floods
                 
-                #find locations of floods (both threshold and mm restirction are true)
-                fidx = np.where(f_loc + r_loc == 2.0)
+                fidx = np.where(f_loc == 1.0)
            
                 f[fidx[0] + 1] = 1 # add 1 to every index after flood defined
 

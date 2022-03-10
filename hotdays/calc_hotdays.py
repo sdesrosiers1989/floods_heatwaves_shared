@@ -44,11 +44,11 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 #%% User inputs - model, temp_type and scenario
 
 # set up save details based on laoded data
-temp_type = 'td'
-#temp_type = 'tw' 
+#temp_type = 'td'
+temp_type = 'tw' 
 mod = 'cp4'
-#scen = 'rcp85'
-scen = 'historical'
+scen = 'rcp85'
+#scen = 'historical'
 area = 'pan_africa'
 hd_thres = '95' # threshold which defines hotdays
 

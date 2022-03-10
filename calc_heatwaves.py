@@ -61,9 +61,9 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 
 # set up save details based on laoded data
 #temp_type = 'td'
-temp_type = 'tw' # currently only ahve fro West Africa
-mod = 'p25'
-scen = 'historical'
+temp_type = 'tw' 
+mod = 'cp4'
+scen = 'rcp85'
 area = 'pan_africa'
 
 #%% Load data basedon user inputs

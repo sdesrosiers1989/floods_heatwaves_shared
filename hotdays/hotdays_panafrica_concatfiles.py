@@ -26,7 +26,7 @@ import glob
 #%% Import data
 #update model name and scenario name in filenames, and saved path at end of script
 
-model = 'p25'
+model = 'cp4'
 scen = 'rcp85'
 temp_type = 'td'
 #scen = 'historical'

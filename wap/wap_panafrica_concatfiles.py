@@ -52,6 +52,7 @@ proj = ccrs.PlateCarree(central_longitude = 38)
 
 model = 'cp4'
 scen = 'rcp85'
+scen = 'histo'
 wind_alpha = 'w44_a0.9'
 m_scen = model + '_' + scen + '_' + wind_alpha
 

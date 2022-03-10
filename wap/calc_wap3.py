@@ -61,9 +61,9 @@ proj = ccrs.PlateCarree(central_longitude = 38)
    
 # set up save details based on laoded data
 save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/wap/'     
-mod = 'p25'
+mod = 'cp4'
 scen =  'histo'
-#scen = 'rcp85'
+scen = 'rcp85'
 area = 'pan_africa'
 #area = 'wa'
 

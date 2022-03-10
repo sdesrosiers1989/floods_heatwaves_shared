@@ -55,7 +55,7 @@ save_path = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/floods/r
 save_path_thres = '/nfs/a321/earsch/floods_heatwaves/processed/wap/pan_africa/thres/'  
 mod = 'cp4'
 scen = 'rcp85'
-loc = 'west_africa'
+loc = 'pan_africa'
 
 fname = '/nfs/a321/earsch/floods_heatwaves/processed/wap/' + loc + '/wap/' + mod + '_' + scen + '*.nc'
 wap = iris.load_cube(fname)
