@@ -15,12 +15,36 @@ Created on Wed Mar 17 09:28:31 2021
 
 # set wd and import packages
 import iris
+import iris.plot as iplt
+import iris.quickplot as qplt
 import iris.coord_categorisation
+from iris.util import rolling_window
+from iris.analysis import Aggregator
+
+from cf_units import Unit
 
 import numpy as np
+import numpy.ma as ma
+
+import cartopy.crs as ccrs
 
 import copy
 
+import glob
+
+import pandas as pd
+
+import matplotlib.pyplot as plt
+
+#Import my functions
+import sys
+sys.path.append('/nfs/see-fs-02_users/earsch/Documents/Leeds/Repos/Tanga/Plot_functions')
+import tanzania1 as tp
+sys.path.append('/nfs/see-fs-02_users/earsch/Documents/Leeds/Repos/Tanga/Onset_functions')
+from onset_functions import masking
+from onset_functions import find_season
+
+proj = ccrs.PlateCarree(central_longitude = 38)
 
 
 
@@ -31,11 +55,11 @@ loc = 'pan_africa'
 mod = 'p25'
 scen = 'historical'
 #scen = 'rcp85'
-hd_thres = 'per95' # threshold for defining heatwaves
+heatwave_thres = 'per95' # threshold for defining heatwaves
 temp_var = 'td' #dry or wet bulb heatwaves
 restrict = str(10.0)
 
-save_path = '/nfs/a321/earsch/floods_heatwaves/processed/combined_events/%s/hotdays/%s/%s/restrict/partial_files/' % (loc, temp_var, hd_thres)  
+save_path = '/nfs/a321/earsch/floods_heatwaves/processed/combined_events/%s/%s/%s/restrict/' % (loc, temp_var, heatwave_thres)  
 
 
 ##flood events
@@ -49,20 +73,20 @@ f_start = iris.load_cube(fname)
 fname = '/nfs/a321/earsch/floods_heatwaves/processed/wap/%s/floods/restrict/end_%s_%s_r%s.nc' % (loc, mod, scen, restrict)
 f_end = iris.load_cube(fname)
 
-##hotdays
-fname = '/nfs/a321/earsch/floods_heatwaves/processed/hotdays/%s/%s/%s/hotdays_%s_%s.nc' \
-% (loc, temp_var, hd_thres, mod, scen)
+##heatwaves
+fname = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/%s/%s/attributes/%s/heatwaves_%s_%s.nc' \
+% (loc, temp_var, heatwave_thres, mod, scen)
 hw = iris.load_cube(fname)
 
 #start ehatwave
-fname = '/nfs/a321/earsch/floods_heatwaves/processed/hotdays/%s/%s/%s/start_%s_%s.nc' \
-% (loc, temp_var, hd_thres, mod, scen)
+fname = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/%s/%s/attributes/%s/startheatwave_%s_%s.nc' \
+% (loc, temp_var, heatwave_thres, mod, scen)
 hw_start = iris.load_cube(fname)
 
 #end heatwave
 # 1= last day of heatwave (is a heatwave day)
-fname = '/nfs/a321/earsch/floods_heatwaves/processed/hotdays/%s/%s/%s/end_%s_%s.nc' \
-% (loc, temp_var, hd_thres, mod, scen)
+fname = '/nfs/a321/earsch/floods_heatwaves/processed/heatwaves/%s/%s/attributes/%s/endheatwave_%s_%s.nc' \
+% (loc, temp_var, heatwave_thres, mod, scen)
 hw_end = iris.load_cube(fname)
 
 
@@ -328,74 +352,47 @@ def get_combined(floods, f_start, f_end, hw, hw_start, hw_end, ls, ndays = [3, 5
 #%%
 #calculate combined events
 
-ndays = [1, 2, 3, 4, 5, 6, 7, 15]
+ndays = [3, 7, 15]
+
+output = get_combined(floods, f_start, f_end, hw, hw_start, hw_end, ls_regrid, ndays)
+
+#%%
+#save data
+var_names = ['ndays', 'nevents', 'duration', 'start', 'end']
 
 
+##save sameday
+save_name = save_path +  'sameday_combinedevents_' + mod + '_' + scen + '.nc'
+iris.save(output[0], save_name)
+#save saemday metrics
+sameday_mets = output[1]
+    
 
-#for pan africa split into parts (need to do all timesteps at once for wap due to window)
-flood_dims = floods.shape
+for i in np.arange(len(sameday_mets)):
 
-#print(pr_dims)
+    save_name = save_path +  'sameday_' + var_names[i] + '_' + mod + '_' + scen + '_r' + str(restrict) + '.nc'
 
-start_idx = np.arange(0, flood_dims[1], 50)
-end_idx = start_idx + 50
-end_idx[-1] = flood_dims[1]
-
-n_parts = len(start_idx)
-for k in np.arange(0, n_parts):
-    print('Starting combined events part ', k, start_idx[k], end_idx[k])
-    new_floods = floods[:, start_idx[k]:end_idx[k], :]
-    new_fstart = f_start[:, start_idx[k]:end_idx[k], :]
-    new_fend = f_end[:, start_idx[k]:end_idx[k], :]
-    new_hw = hw[:, start_idx[k]:end_idx[k], :]
-    new_hstart = hw_start[:, start_idx[k]:end_idx[k], :]
-    new_hend = hw_end[:, start_idx[k]:end_idx[k], :]
-    new_ls = ls_regrid[start_idx[k]:end_idx[k], :]
-    
-    output = get_combined(new_floods, new_fstart, new_fend, new_hw, new_hstart, new_hend, new_ls, ndays)
-            
-    print('Saving combined events part ', k)
-    
-    
-    #save data
-    var_names = ['ndays', 'nevents', 'duration', 'start', 'end']
-    
-    
-    ##save sameday
-    save_name = save_path +  'sameday_combinedevents_' + mod + '_' + scen + '.nc'
-    iris.save(output[0], save_name)
-    #save saemday metrics
-    sameday_mets = output[1]
-        
-    
-    for i in np.arange(len(sameday_mets)):
-    
-        save_name = save_path +  'sameday_' + var_names[i] + '_' + mod + '_' + scen + '_r' + str(restrict) + '.nc'
-    
-        iris.save(sameday_mets[i], save_name)
-    
-    
-    # save fbefore/fafter
-    fbefore = output[2]
-    fafter = output[4]
-    
-    for n in np.arange(len(ndays)):
-        
-        save_name = save_path +  'fbefore_' + str(ndays[n]) + '_combinedevents_' + mod + '_' + scen + '_r' + str(restrict) + '.nc'
-        iris.save(fbefore[n], save_name)
-        save_name = save_path +  'fafter_' + str(ndays[n]) + '_combinedevents_' + mod + '_' + scen + '_r' + str(restrict) + '.nc'
-        iris.save(fafter[n], save_name)
-    
-    #save before/after mets
-    fbefore_mets = output[3]
-    fafter_mets = output[5]
-    for n in np.arange(len(ndays)):
-        
-        for i in np.arange(len(fbefore_mets[n])):
-            save_name = save_path +  'fbefore_' + str(ndays[n]) + '_' + var_names[i] + '_' + mod + '_' + scen + '_r' + str(restrict) + '.nc'
-            iris.save(fbefore_mets[n][i], save_name)
-            save_name = save_path +  'fafter_' + str(ndays[n]) + '_' + var_names[i] + '_' + mod + '_' + scen + '_r' + str(restrict) + '.nc'
-            iris.save(fafter_mets[n][i], save_name)
+    iris.save(sameday_mets[i], save_name)
 
 
+# save fbefore/fafter
+fbefore = output[2]
+fafter = output[4]
 
+for n in np.arange(len(ndays)):
+    
+    save_name = save_path +  'fbefore_' + str(ndays[n]) + '_combinedevents_' + mod + '_' + scen + '_r' + str(restrict) + '.nc'
+    iris.save(fbefore[n], save_name)
+    save_name = save_path +  'fafter_' + str(ndays[n]) + '_combinedevents_' + mod + '_' + scen + '_r' + str(restrict) + '.nc'
+    iris.save(fafter[n], save_name)
+
+#save before/after mets
+fbefore_mets = output[3]
+fafter_mets = output[5]
+for n in np.arange(len(ndays)):
+    
+    for i in np.arange(len(fbefore_mets[n])):
+        save_name = save_path +  'fbefore_' + str(ndays[n]) + '_' + var_names[i] + '_' + mod + '_' + scen + '_r' + str(restrict) + '.nc'
+        iris.save(fbefore_mets[n][i], save_name)
+        save_name = save_path +  'fafter_' + str(ndays[n]) + '_' + var_names[i] + '_' + mod + '_' + scen + '_r' + str(restrict) + '.nc'
+        iris.save(fafter_mets[n][i], save_name)
